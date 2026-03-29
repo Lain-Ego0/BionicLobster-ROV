@@ -1,6 +1,6 @@
 /.tools/
 /build/
-/Boston Big Guy V1/OBJ/
+/firmware/OBJ/
 
 *.axf
 *.crf
@@ -17,8 +17,8 @@
 *.uvguix.*
 *.uvoptx
 
-/Boston Big Guy V1/USER/DebugConfig/
-/Boston Big Guy V1/USER/EventRecorderStub.scvd
-/Boston Big Guy V1/USER/JLink*.txt
-/Boston Big Guy V1/USER/JLink*.ini
-/Boston Big Guy V1/USER/Nu_Link_Driver.ini
+/firmware/USER/DebugConfig/
+/firmware/USER/EventRecorderStub.scvd
+/firmware/USER/JLink*.txt
+/firmware/USER/JLink*.ini
+/firmware/USER/Nu_Link_Driver.ini
