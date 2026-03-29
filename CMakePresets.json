@@ -22,7 +22,8 @@
       "name": "local-debug",
       "configurePreset": "local-debug",
       "targets": [
-        "TIMER.elf"
+        "firmware.elf",
+        "firmware_quad.elf"
       ]
     }
   ]

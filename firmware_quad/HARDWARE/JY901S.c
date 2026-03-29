@@ -1,66 +1,100 @@
 #include "JY901S.h"
 #include "string.h"
 
-struct STime		stcTime;
-struct SAcc 		stcAcc;
-struct SGyro 		stcGyro;
-struct SAngle 	stcAngle;
-struct SMag 		stcMag;
+struct STime stcTime;
+struct SAcc stcAcc;
+struct SGyro stcGyro;
+struct SAngle stcAngle;
+struct SMag stcMag;
 struct SDStatus stcDStatus;
-struct SPress 	stcPress;
-struct SLonLat 	stcLonLat;
-struct SGPSV 		stcGPSV;
-struct SQ       stcQ;
+struct SPress stcPress;
+struct SLonLat stcLonLat;
+struct SGPSV stcGPSV;
+struct SQ stcQ;
 
-//static unsigned char TxBuffer[256];
-//static unsigned char count=0; 
-
+static uint8_t g_jy901s_angle_ready;
+static unsigned char g_rx_buffer[11];
+static unsigned char g_rx_count;
 
 void sendcmd(char *cmd)
 {
-	int i=0;
-	for(i=0;i<5;i++)
-	{
-		UART2_Put_Char(cmd[i]);
-	}
-		
-}
-void UART2_Put_Char(unsigned char DataToSend)
-{
-//	TxBuffer[count++] = DataToSend;  
-//  USART_ITConfig(USART2, USART_IT_TXE, ENABLE);  
+    int i;
+
+    for (i = 0; i < 5; i++)
+    {
+        UART2_Put_Char((unsigned char)cmd[i]);
+    }
 }
 
-//CopeSerialData为串口2中断调用函数，串口每收到一个数据，调用一次这个函数。
+void UART2_Put_Char(unsigned char data_to_send)
+{
+    USART_SendData(USART2, data_to_send);
+    while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET)
+    {
+    }
+}
+
 void CopeSerial2Data(unsigned char ucData)
 {
-//	static unsigned char ucRxBuffer[250];
-//	static unsigned char ucRxCnt = 0;	
-//	
-//	
-//	ucRxBuffer[ucRxCnt++]=ucData;	//将收到的数据存入缓冲区中
-//	if (ucRxBuffer[0]!=0x55) //数据头不对，则重新开始寻找0x55数据头
-//	{
-//		ucRxCnt=0;
-//		return;
-//	}
-//	if (ucRxCnt<11) {return;}//数据不满11个，则返回
-//	else
-//	{
-//		switch(ucRxBuffer[1])//判断数据是哪种数据，然后将其拷贝到对应的结构体中，有些数据包需要通过上位机打开对应的输出后，才能接收到这个数据包的数据
-//		{
-//			case 0x50:	memcpy(&stcTime,&ucRxBuffer[2],8);break;//memcpy为编译器自带的内存拷贝函数，需引用"string.h"，将接收缓冲区的字符拷贝到数据结构体里面，从而实现数据的解析。
-//			case 0x51:	memcpy(&stcAcc,&ucRxBuffer[2],8);break;
-//			case 0x52:	memcpy(&stcGyro,&ucRxBuffer[2],8);break;
-//			case 0x53:	memcpy(&stcAngle,&ucRxBuffer[2],8);break;
-//			case 0x54:	memcpy(&stcMag,&ucRxBuffer[2],8);break;
-//			case 0x55:	memcpy(&stcDStatus,&ucRxBuffer[2],8);break;
-//			case 0x56:	memcpy(&stcPress,&ucRxBuffer[2],8);break;
-//			case 0x57:	memcpy(&stcLonLat,&ucRxBuffer[2],8);break;
-//			case 0x58:	memcpy(&stcGPSV,&ucRxBuffer[2],8);break;
-//			case 0x59:	memcpy(&stcQ,&ucRxBuffer[2],8);break;
-//		}
-//		ucRxCnt=0;//清空缓存区}
+    uint8_t checksum = 0;
+    uint8_t i;
+
+    if (g_rx_count == 0 && ucData != 0x55)
+    {
+        return;
+    }
+
+    g_rx_buffer[g_rx_count++] = ucData;
+    if (g_rx_count < 11)
+    {
+        return;
+    }
+
+    for (i = 0; i < 10; i++)
+    {
+        checksum += g_rx_buffer[i];
+    }
+
+    if (checksum == g_rx_buffer[10])
+    {
+        switch (g_rx_buffer[1])
+        {
+            case 0x50: memcpy(&stcTime, &g_rx_buffer[2], 8); break;
+            case 0x51: memcpy(&stcAcc, &g_rx_buffer[2], 8); break;
+            case 0x52: memcpy(&stcGyro, &g_rx_buffer[2], 8); break;
+            case 0x53:
+                memcpy(&stcAngle, &g_rx_buffer[2], 8);
+                g_jy901s_angle_ready = 1;
+                break;
+            case 0x54: memcpy(&stcMag, &g_rx_buffer[2], 8); break;
+            case 0x55: memcpy(&stcDStatus, &g_rx_buffer[2], 8); break;
+            case 0x56: memcpy(&stcPress, &g_rx_buffer[2], 8); break;
+            case 0x57: memcpy(&stcLonLat, &g_rx_buffer[2], 8); break;
+            case 0x58: memcpy(&stcGPSV, &g_rx_buffer[2], 8); break;
+            case 0x59: memcpy(&stcQ, &g_rx_buffer[2], 8); break;
+            default: break;
+        }
+    }
+
+    g_rx_count = 0;
 }
 
- 
+uint8_t JY901S_AngleReady(void)
+{
+    return g_jy901s_angle_ready;
+}
+
+float JY901S_GetRollDeg(void)
+{
+    return stcAngle.Angle[0] / 32768.0f * 180.0f;
+}
+
+float JY901S_GetPitchDeg(void)
+{
+    return stcAngle.Angle[1] / 32768.0f * 180.0f;
+}
+
+float JY901S_GetYawDeg(void)
+{
+    return stcAngle.Angle[2] / 32768.0f * 180.0f;
+}

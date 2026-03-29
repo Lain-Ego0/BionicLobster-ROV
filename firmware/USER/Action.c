@@ -1,361 +1,123 @@
 #include "main.h"
-int stop=0;
-/*
-头：从右往左吹
-尾3：从左往右吹
-尾2：从上往下吹
-右上：
-*/
-void Start()
-//（实质也是停止初始状态）
+
+static void ResetHandPose(void)
 {
-	L_Elbow(35.0);    			// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     			// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   			// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       			// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(0);     			// 设置头部电机速度
-   // Tail_Motor1(0);   			// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   			// 设置尾部电机3速度
+    L_Elbow(35.0f);
+    L_Claw(0.0f);
+    R_Claw(0.0f);
+    R_Elbow(35.0f);
 }
 
-
-void MoveForward() //修改
+static void StopContinuousServos(void)
 {
-	L_Elbow(35.0);    			// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     			// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   			// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-	Tail_Servo1(-1); 			// 设置尾部上侧 360 度舵机速度（负数放，正数收）
-    Tail_Servo2(2);  			// 设置尾部下侧 360 度舵机速度（负数放，正数收）	
-    // 控制无刷电机速度
-    L_Motor(0);       			// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(0);     			// 设置头部电机速度
-   // Tail_Motor1(0);   			// 设置尾部电机1速度
-    Tail_Motor2(-5);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   			// 设置尾部电机3速度
+    L_Upper_360(0.0f);
+    L_Lower_360(0.0f);
+    R_Upper_360(0.0f);
+    R_Lower_360(0.0f);
+    Tail_Servo1(0.0f);
+    Tail_Servo2(0.0f);
 }
 
-// 后退
-void MoveBackward() //修改
+void Start(void)
 {
-    L_Elbow(35.0);    		// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     		// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   		// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(-1); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(2);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       		// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(0);     		// 设置头部电机速度
-   // Tail_Motor1(0);   		// 设置尾部电机1速度
-    Tail_Motor2(5);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   		// 设置尾部电机3速度
+    ResetHandPose();
+    StopContinuousServos();
 }
 
-int a2=1;
-int a3=0;
-
-// 左移
-void MoveLeft()
+void MoveForward(void)
 {
-   	L_Elbow(35.0);    			// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     			// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   			// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       			// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(-5);     			// 设置头部电机速度(ok)
-   // Tail_Motor1(0);   			// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(5);   			// 设置尾部电机3速度
-}
-int b2=0;
-int b3=-1;
-// 右移
-void MoveRight() 
-{
-    L_Elbow(35.0);    			// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     			// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   			// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       			// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(5);     			// 设置头部电机速度
-   // Tail_Motor1(0);   			// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(-5);   			// 设置尾部电机3速度
+    ResetHandPose();
+    L_Upper_360(0.0f);
+    L_Lower_360(0.0f);
+    R_Upper_360(0.0f);
+    R_Lower_360(0.0f);
+    Tail_Servo1(-1.0f);
+    Tail_Servo2(2.0f);
 }
 
-// 左转
-void TurnLeft() 
+void MoveBackward(void)
 {
-   	L_Elbow(35.0);    			// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     			// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   			// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       			// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(-5);     			// 设置头部电机速度(ok)
-    //Tail_Motor1(0);   			// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(-5);   			// 设置尾部电机3速度
+    ResetHandPose();
+    L_Upper_360(0.0f);
+    L_Lower_360(0.0f);
+    R_Upper_360(0.0f);
+    R_Lower_360(0.0f);
+    Tail_Servo1(-1.0f);
+    Tail_Servo2(2.0f);
 }
 
-// 右转
-void TurnRight() 
+void MoveLeft(void)
 {
-	L_Elbow(35.0);    			// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     			// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   			// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       			// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(5);     			// 设置头部电机速度(ok)
-    //Tail_Motor1(0);   			// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(5);   			// 设置尾部电机3速度
+    Start();
 }
 
-// 上升
-void Ascend()
+void MoveRight(void)
 {
-	L_Elbow(35.0);    			// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     			// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0.01);   			// 设置左上 360 度舵机速度
-    L_Lower_360(0.01);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0.01);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0.01);  			// 设置右下 360 度舵机速度//（正上顺）
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-	L_Motor(-5);       			// 设置左上电机速度（往下吹）
-	R_Motor(5);      			// 设置右上电机速度（往下吹）
-    HeadMotor(0);     			// 设置头部电机速度
-   // Tail_Motor1(0);   			// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   			// 设置尾部电机3速度
+    Start();
 }
 
-// 下降
-void Descend() 
+void TurnLeft(void)
 {
-	L_Elbow(35.0);    			// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     			// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0.01);   			// 设置左上 360 度舵机速度
-    L_Lower_360(0.01);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0.01);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0.01);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(5);       			// 设置左上电机速度（往上吹）
-    R_Motor(-5);      			// 设置右上电机速度（往上吹）
-    HeadMotor(0);     			// 设置头部电机速度
-   // Tail_Motor1(0);   			// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   			// 设置尾部电机3速度
-}
-//一键左夹爪打开(按下为关，松开为放)
-void LeftHand_Open(void) 
-{
-    L_Elbow(35.0);    		// 设置左肘到 35 度
-    L_Claw(135.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     		// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(-1);   		// 设置左上 360 度舵机速度
-    L_Lower_360(1);  			// 设置左下 360 度舵机速度
-    R_Upper_360(-1);  			// 设置右上 360 度舵机速度
-    R_Lower_360(1);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       		// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(0);     		// 设置头部电机速度
-    //Tail_Motor1(0);   		// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   		// 设置尾部电机3速度
-	
+    MoveLeft();
 }
 
-//一键右夹爪打开(按下为关，松开为放)
+void TurnRight(void)
+{
+    MoveRight();
+}
+
+void Ascend(void)
+{
+    Start();
+}
+
+void Descend(void)
+{
+    Start();
+}
+
+void LeftHand_Open(void)
+{
+    ResetHandPose();
+    L_Claw(135.0f);
+    L_Upper_360(-1.0f);
+    L_Lower_360(1.0f);
+    R_Upper_360(0.0f);
+    R_Lower_360(0.0f);
+    Tail_Servo1(0.0f);
+    Tail_Servo2(0.0f);
+}
+
 void RightHand_Open(void)
 {
-	 L_Elbow(35.0);    		// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(135.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     		// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(1);   		// 设置左上 360 度舵机速度
-    L_Lower_360(-1);  			// 设置左下 360 度舵机速度
-    R_Upper_360(1);  			// 设置右上 360 度舵机速度
-    R_Lower_360(-1);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       		// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(0);     		// 设置头部电机速度
-    //Tail_Motor1(0);   		// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   		// 设置尾部电机3速度
+    ResetHandPose();
+    R_Claw(135.0f);
+    L_Upper_360(0.0f);
+    L_Lower_360(0.0f);
+    R_Upper_360(1.0f);
+    R_Lower_360(-1.0f);
+    Tail_Servo1(0.0f);
+    Tail_Servo2(0.0f);
 }
 
-//左臂舒展
-void LeftARM_Open(void) 
+void LeftARM_Open(void)
 {
-    L_Elbow(100.0);    		// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     		// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   		// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       		// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(0);     		// 设置头部电机速度
-    //Tail_Motor1(0);   		// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   		// 设置尾部电机3速度
-	
-}
-//右臂舒展
-void RightARM_Open(void) 
-{
-    L_Elbow(35.0);    		// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(100.0);     		// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   		// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       		// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(0);     		// 设置头部电机速度
-    //Tail_Motor1(0);   		// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   		// 设置尾部电机3速度
-	
+    Start();
+    L_Elbow(100.0f);
 }
 
-// 一键左手抓夹
-void LeftHandGrab() 
+void RightARM_Open(void)
 {
-    L_Elbow(35.0);    		// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     		// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   		// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       		// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(0);     		// 设置头部电机速度
-    //Tail_Motor1(0);   		// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   		// 设置尾部电机3速度
-	
+    Start();
+    R_Elbow(100.0f);
 }
 
-// 一键右手抓夹
-void RightHandGrab()
+void LeftHandGrab(void)
 {
-    L_Elbow(35.0);    		// 设置左肘到 35 度
-    L_Claw(0.0);     			// 设置左爪到 0 度
-    R_Claw(0.0);    			// 设置右爪到 0 度
-    R_Elbow(35.0);     		// 设置右肘到 35 度
-    // 控制 360 度舵机速度
-    L_Upper_360(0);   		// 设置左上 360 度舵机速度
-    L_Lower_360(0);  			// 设置左下 360 度舵机速度
-    R_Upper_360(0);  			// 设置右上 360 度舵机速度
-    R_Lower_360(0);  			// 设置右下 360 度舵机速度
-    Tail_Servo1(0); 			// 设置尾部上侧 360 度舵机速度
-    Tail_Servo2(0);  			// 设置尾部下侧 360 度舵机速度
-    // 控制无刷电机速度
-    L_Motor(0);       		// 设置左上电机速度
-    R_Motor(0);      			// 设置右上电机速度
-    HeadMotor(0);     		// 设置头部电机速度
-    //Tail_Motor1(0);   		// 设置尾部电机1速度
-    Tail_Motor2(0);  			// 设置尾部电机2速度
-    Tail_Motor3(0);   		// 设置尾部电机3速度
+    LeftHand_Open();
 }
 
-	
-	
+void RightHandGrab(void)
+{
+    RightHand_Open();
+}

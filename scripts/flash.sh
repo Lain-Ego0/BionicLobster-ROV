@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ELF_FILE="${1:-${ROOT_DIR}/build/TIMER.elf}"
+ELF_FILE="${1:-${ROOT_DIR}/build/firmware.elf}"
 
 if [[ ! -f "${ELF_FILE}" ]]; then
     "${ROOT_DIR}/scripts/build.sh"

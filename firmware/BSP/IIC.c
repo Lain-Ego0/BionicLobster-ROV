@@ -1,238 +1,265 @@
 #include "IIC.h"
 #include "delay.h"
 
-//#define IIC_SCL    PBout(4) //SCL
-//#define IIC_SDA    PBout(3) //SDA
-//#define READ_SDA   PBin(3)  //输入SDA 
+static const SoftI2CBus g_default_i2c_bus = {GPIOB, GPIO_Pin_4, GPIOB, GPIO_Pin_3};
 
-/*引脚配置层*/
-
-/**
-  * 函    数：I2C写SCL引脚电平
-  * 参    数：BitValue 协议层传入的当前需要写入SCL的电平，范围0~1
-  * 返 回 值：无
-  * 注意事项：此函数需要用户实现内容，当BitValue为0时，需要置SCL为低电平，当BitValue为1时，需要置SCL为高电平
-  */
-void MyI2C_W_SCL(uint8_t BitValue)
+static void MyI2C_EnableClock(GPIO_TypeDef *port)
 {
-	GPIO_WriteBit(GPIOB, GPIO_Pin_4, (BitAction)BitValue);		//根据BitValue，设置SCL引脚的电平
-	delay_us(10);												//延时10us，防止时序频率超过要求
+    if (port == GPIOA)
+    {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    }
+    else if (port == GPIOB)
+    {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    }
 }
 
-/**
-  * 函    数：I2C写SDA引脚电平
-  * 参    数：BitValue 协议层传入的当前需要写入SDA的电平，范围0~0xFF
-  * 返 回 值：无
-  * 注意事项：此函数需要用户实现内容，当BitValue为0时，需要置SDA为低电平，当BitValue非0时，需要置SDA为高电平
-  */
-void MyI2C_W_SDA(uint8_t BitValue)
+static void MyI2C_ConfigOutput(GPIO_TypeDef *port, uint16_t pin)
 {
-	GPIO_WriteBit(GPIOB, GPIO_Pin_3, (BitAction)BitValue);		//根据BitValue，设置SDA引脚的电平，BitValue要实现非0即1的特性
-	delay_us(10);												//延时10us，防止时序频率超过要求
+    GPIO_InitTypeDef gpio_init_structure;
+
+    gpio_init_structure.GPIO_Pin = pin;
+    gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_OD;
+    gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(port, &gpio_init_structure);
 }
 
-/**
-  * 函    数：I2C读SDA引脚电平
-  * 参    数：无
-  * 返 回 值：协议层需要得到的当前SDA的电平，范围0~1
-  * 注意事项：此函数需要用户实现内容，当前SDA为低电平时，返回0，当前SDA为高电平时，返回1
-  */
-uint8_t MyI2C_R_SDA(void)
+static void MyI2C_ConfigInput(GPIO_TypeDef *port, uint16_t pin)
 {
-	uint8_t BitValue;
-	BitValue = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_3);		//读取SDA电平
-	delay_us(10);												//延时10us，防止时序频率超过要求
-	return BitValue;											//返回SDA电平
+    GPIO_InitTypeDef gpio_init_structure;
+
+    gpio_init_structure.GPIO_Pin = pin;
+    gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;
+    gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(port, &gpio_init_structure);
 }
 
-/**
-  * 函    数：I2C初始化
-  * 参    数：无
-  * 返 回 值：无
-  * 注意事项：此函数需要用户实现内容，实现SCL和SDA引脚的初始化
-  */
-void MyI2C_Init(void)
+static void MyI2C_W_SCL_Bus(const SoftI2CBus *bus, uint8_t bit_value)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(	RCC_APB2Periph_GPIOB, ENABLE );	
-	   
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4|GPIO_Pin_3;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP ;   //推挽输出
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
- 
-	
-	MyI2C_W_SCL(1);
-	MyI2C_W_SDA(1);
-	delay_ms(1);	
-//	GPIO_InitTypeDef  GPIO_InitStructure;
-
-//	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);//使能GPIOB时钟
-
-//	//GPIOB8,B9初始化设置
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//普通输出模式
-//	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100MHz
-//	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
-//	GPIO_Init(GPIOE, &GPIO_InitStructure);//初始化
-//	/*设置默认电平*/
-//	GPIO_SetBits(GPIOE, GPIO_Pin_5 | GPIO_Pin_6);			//设置PB10和PB11引脚初始化后默认为高电平（释放总线状态）
+    GPIO_WriteBit(bus->scl_port, bus->scl_pin, (BitAction)bit_value);
+    delay_us(5);
 }
 
-/*协议层*/
-
-/**
-  * 函    数：I2C起始
-  * 参    数：无
-  * 返 回 值：无
-  */
-void MyI2C_Start(void)
+static void MyI2C_W_SDA_Bus(const SoftI2CBus *bus, uint8_t bit_value)
 {
-	MyI2C_W_SDA(1);							//释放SDA，确保SDA为高电平
-	MyI2C_W_SCL(1);							//释放SCL，确保SCL为高电平
-	MyI2C_W_SDA(0);							//在SCL高电平期间，拉低SDA，产生起始信号
-	MyI2C_W_SCL(0);							//起始后把SCL也拉低，即为了占用总线，也为了方便总线时序的拼接
+    MyI2C_ConfigOutput(bus->sda_port, bus->sda_pin);
+    GPIO_WriteBit(bus->sda_port, bus->sda_pin, (BitAction)bit_value);
+    delay_us(5);
 }
 
-/**
-  * 函    数：I2C终止
-  * 参    数：无
-  * 返 回 值：无
-  */
-void MyI2C_Stop(void)
+static uint8_t MyI2C_R_SDA_Bus(const SoftI2CBus *bus)
 {
-	MyI2C_W_SDA(0);							//拉低SDA，确保SDA为低电平
-	MyI2C_W_SCL(1);							//释放SCL，使SCL呈现高电平
-	MyI2C_W_SDA(1);							//在SCL高电平期间，释放SDA，产生终止信号
+    uint8_t bit_value;
+
+    MyI2C_ConfigInput(bus->sda_port, bus->sda_pin);
+    delay_us(2);
+    bit_value = GPIO_ReadInputDataBit(bus->sda_port, bus->sda_pin);
+    delay_us(5);
+    return bit_value;
 }
 
-/**
-  * 函    数：I2C发送一个字节
-  * 参    数：Byte 要发送的一个字节数据，范围：0x00~0xFF
-  * 返 回 值：无
-  */
-void MyI2C_SendByte(uint8_t Byte)
+void MyI2C_InitBus(const SoftI2CBus *bus)
 {
-	uint8_t i;
-	for (i = 0; i < 8; i ++)				//循环8次，主机依次发送数据的每一位
-	{
-		MyI2C_W_SDA(Byte & (0x80 >> i));	//使用掩码的方式取出Byte的指定一位数据并写入到SDA线
-		MyI2C_W_SCL(1);						//释放SCL，从机在SCL高电平期间读取SDA
-		MyI2C_W_SCL(0);						//拉低SCL，主机开始发送下一位数据
-	}
+    MyI2C_EnableClock(bus->scl_port);
+    MyI2C_EnableClock(bus->sda_port);
+
+    MyI2C_ConfigOutput(bus->scl_port, bus->scl_pin);
+    MyI2C_ConfigOutput(bus->sda_port, bus->sda_pin);
+
+    GPIO_SetBits(bus->scl_port, bus->scl_pin);
+    GPIO_SetBits(bus->sda_port, bus->sda_pin);
+    delay_ms(1);
 }
 
-/**
-  * 函    数：I2C接收一个字节
-  * 参    数：无
-  * 返 回 值：接收到的一个字节数据，范围：0x00~0xFF
-  */
-uint8_t MyI2C_ReceiveByte(void)
+void MyI2C_StartBus(const SoftI2CBus *bus)
 {
-	uint8_t i, Byte = 0x00;					//定义接收的数据，并赋初值0x00，此处必须赋初值0x00，后面会用到
-	MyI2C_W_SDA(1);							//接收前，主机先确保释放SDA，避免干扰从机的数据发送
-	for (i = 0; i < 8; i ++)				//循环8次，主机依次接收数据的每一位
-	{
-		MyI2C_W_SCL(1);						//释放SCL，主机机在SCL高电平期间读取SDA
-		if (MyI2C_R_SDA() == 1){Byte |= (0x80 >> i);}	//读取SDA数据，并存储到Byte变量
-														//当SDA为1时，置变量指定位为1，当SDA为0时，不做处理，指定位为默认的初值0
-		MyI2C_W_SCL(0);						//拉低SCL，从机在SCL低电平期间写入SDA
-	}
-	return Byte;							//返回接收到的一个字节数据
+    MyI2C_W_SDA_Bus(bus, 1);
+    MyI2C_W_SCL_Bus(bus, 1);
+    MyI2C_W_SDA_Bus(bus, 0);
+    MyI2C_W_SCL_Bus(bus, 0);
 }
 
-/**
-  * 函    数：I2C发送应答位
-  * 参    数：Byte 要发送的应答位，范围：0~1，0表示应答，1表示非应答
-  * 返 回 值：无
-  */
-void MyI2C_SendAck(uint8_t AckBit)
+void MyI2C_StopBus(const SoftI2CBus *bus)
 {
-	MyI2C_W_SDA(AckBit);					//主机把应答位数据放到SDA线
-	MyI2C_W_SCL(1);							//释放SCL，从机在SCL高电平期间，读取应答位
-	MyI2C_W_SCL(0);							//拉低SCL，开始下一个时序模块
+    MyI2C_W_SDA_Bus(bus, 0);
+    MyI2C_W_SCL_Bus(bus, 1);
+    MyI2C_W_SDA_Bus(bus, 1);
 }
 
-/**
-  * 函    数：I2C接收应答位
-  * 参    数：无
-  * 返 回 值：接收到的应答位，范围：0~1，0表示应答，1表示非应答
-  */
-uint8_t MyI2C_ReceiveAck(void)
+void MyI2C_SendByteBus(const SoftI2CBus *bus, uint8_t byte)
 {
-	uint8_t AckBit;							//定义应答位变量
-	MyI2C_W_SDA(1);							//接收前，主机先确保释放SDA，避免干扰从机的数据发送
-	MyI2C_W_SCL(1);							//释放SCL，主机机在SCL高电平期间读取SDA
-	AckBit = MyI2C_R_SDA();					//将应答位存储到变量里
-	MyI2C_W_SCL(0);							//拉低SCL，开始下一个时序模块
-	return AckBit;							//返回定义应答位变量
-}
-//*************************************************************
-//等待应答信号到来
-//返回值：1，接收应答失败
-//        0，接收应答成功
-uint8_t MYIIC_Wait_Ack(void)
-{
-	uint8_t ucErrTime=0;
-	
-		MyI2C_W_SDA(1);
-		delay_ms(1);
-		MyI2C_W_SCL(1);
-		delay_ms(1);
-	while(MyI2C_R_SDA())
-	{
-		ucErrTime++;
-		if(ucErrTime>250)
-		{
-			MyI2C_Stop();
-			return 1;
-		}
-	}
-	MyI2C_W_SCL(0);//时钟输出0 	   
-	return 0;  
+    uint8_t i;
 
+    for (i = 0; i < 8; i++)
+    {
+        MyI2C_W_SDA_Bus(bus, byte & (0x80U >> i));
+        MyI2C_W_SCL_Bus(bus, 1);
+        MyI2C_W_SCL_Bus(bus, 0);
+    }
 }
 
-//读1个字节，ack=1时，发送ACK，ack=0，发送nACK   
-uint8_t IIC_Read_Byte(unsigned char ack)
+uint8_t MyI2C_ReceiveByteBus(const SoftI2CBus *bus)
 {
-	unsigned char i,receive=0;
-    for(i=0;i<8;i++ )
-		{
-        MyI2C_W_SCL(0);
-        delay_ms(2);
-        MyI2C_W_SCL(1);
-        receive<<=1;
-        if(MyI2C_R_SDA())
-				{
-					receive++;   
-				}
-				delay_ms(1); 
-    }					 
-    if (!ack)
-        MYIIC_NAck();//发送nACK
+    uint8_t i;
+    uint8_t byte = 0;
+
+    MyI2C_W_SDA_Bus(bus, 1);
+    for (i = 0; i < 8; i++)
+    {
+        MyI2C_W_SCL_Bus(bus, 1);
+        if (MyI2C_R_SDA_Bus(bus) == 1)
+        {
+            byte |= (0x80U >> i);
+        }
+        MyI2C_W_SCL_Bus(bus, 0);
+    }
+
+    return byte;
+}
+
+void MyI2C_SendAckBus(const SoftI2CBus *bus, uint8_t ack_bit)
+{
+    MyI2C_W_SDA_Bus(bus, ack_bit);
+    MyI2C_W_SCL_Bus(bus, 1);
+    MyI2C_W_SCL_Bus(bus, 0);
+}
+
+uint8_t MyI2C_ReceiveAckBus(const SoftI2CBus *bus)
+{
+    uint8_t ack_bit;
+
+    MyI2C_W_SDA_Bus(bus, 1);
+    MyI2C_W_SCL_Bus(bus, 1);
+    ack_bit = MyI2C_R_SDA_Bus(bus);
+    MyI2C_W_SCL_Bus(bus, 0);
+    return ack_bit;
+}
+
+uint8_t MYIIC_Wait_AckBus(const SoftI2CBus *bus)
+{
+    uint8_t timeout = 0;
+
+    MyI2C_W_SDA_Bus(bus, 1);
+    delay_us(5);
+    MyI2C_W_SCL_Bus(bus, 1);
+    delay_us(5);
+
+    while (MyI2C_R_SDA_Bus(bus))
+    {
+        timeout++;
+        if (timeout > 250)
+        {
+            MyI2C_StopBus(bus);
+            return 1;
+        }
+    }
+
+    MyI2C_W_SCL_Bus(bus, 0);
+    return 0;
+}
+
+uint8_t IIC_Read_ByteBus(const SoftI2CBus *bus, unsigned char ack)
+{
+    unsigned char i;
+    uint8_t receive = 0;
+
+    for (i = 0; i < 8; i++)
+    {
+        MyI2C_W_SCL_Bus(bus, 0);
+        delay_us(5);
+        MyI2C_W_SCL_Bus(bus, 1);
+        receive <<= 1;
+        if (MyI2C_R_SDA_Bus(bus))
+        {
+            receive++;
+        }
+        delay_us(5);
+    }
+
+    if (ack == 0)
+    {
+        MYIIC_NAckBus(bus);
+    }
     else
-        MYIIC_Ack(); //发送ACK   
+    {
+        MYIIC_AckBus(bus);
+    }
+
     return receive;
 }
-//产生ACK应答
+
+void MYIIC_AckBus(const SoftI2CBus *bus)
+{
+    MyI2C_W_SCL_Bus(bus, 0);
+    MyI2C_W_SDA_Bus(bus, 0);
+    delay_us(5);
+    MyI2C_W_SCL_Bus(bus, 1);
+    delay_us(5);
+    MyI2C_W_SCL_Bus(bus, 0);
+}
+
+void MYIIC_NAckBus(const SoftI2CBus *bus)
+{
+    MyI2C_W_SCL_Bus(bus, 0);
+    MyI2C_W_SDA_Bus(bus, 1);
+    delay_us(5);
+    MyI2C_W_SCL_Bus(bus, 1);
+    delay_us(5);
+    MyI2C_W_SCL_Bus(bus, 0);
+}
+
+void MyI2C_Init(void)
+{
+    MyI2C_InitBus(&g_default_i2c_bus);
+}
+
+void MyI2C_Start(void)
+{
+    MyI2C_StartBus(&g_default_i2c_bus);
+}
+
+void MyI2C_Stop(void)
+{
+    MyI2C_StopBus(&g_default_i2c_bus);
+}
+
+void MyI2C_SendByte(uint8_t byte)
+{
+    MyI2C_SendByteBus(&g_default_i2c_bus, byte);
+}
+
+uint8_t MyI2C_ReceiveByte(void)
+{
+    return MyI2C_ReceiveByteBus(&g_default_i2c_bus);
+}
+
+void MyI2C_SendAck(uint8_t ack_bit)
+{
+    MyI2C_SendAckBus(&g_default_i2c_bus, ack_bit);
+}
+
+uint8_t MyI2C_ReceiveAck(void)
+{
+    return MyI2C_ReceiveAckBus(&g_default_i2c_bus);
+}
+
+uint8_t MYIIC_Wait_Ack(void)
+{
+    return MYIIC_Wait_AckBus(&g_default_i2c_bus);
+}
+
+uint8_t IIC_Read_Byte(unsigned char ack)
+{
+    return IIC_Read_ByteBus(&g_default_i2c_bus, ack);
+}
+
 void MYIIC_Ack(void)
 {
-	MyI2C_W_SCL(0);
-	MyI2C_W_SDA(0);
-	delay_ms(2);
-	MyI2C_W_SCL(1);
-	delay_ms(2);
-	MyI2C_W_SCL(0);
+    MYIIC_AckBus(&g_default_i2c_bus);
 }
-//不产生ACK应答		    
+
 void MYIIC_NAck(void)
 {
-	MyI2C_W_SCL(0);
-	MyI2C_W_SDA(1);
-	delay_ms(2);
-	MyI2C_W_SCL(1);
-	delay_ms(2);
-	MyI2C_W_SCL(0);
-}					 				 
+    MYIIC_NAckBus(&g_default_i2c_bus);
+}

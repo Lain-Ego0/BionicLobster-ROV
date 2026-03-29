@@ -3,7 +3,6 @@
 
 #include "main.h"
 
-
 #define SAVE 			0x00
 #define CALSW 		0x01
 #define RSW 			0x02
@@ -46,7 +45,7 @@
 #define GZ					0x39
 #define HX					0x3a
 #define HY					0x3b
-#define HZ					0x3c			
+#define HZ					0x3c
 #define Roll				0x3d
 #define Pitch				0x3e
 #define Yaw					0x3f
@@ -71,78 +70,88 @@
 #define q1          0x52
 #define q2          0x53
 #define q3          0x54
-      
-#define DIO_MODE_AIN 0
-#define DIO_MODE_DIN 1
-#define DIO_MODE_DOH 2
-#define DIO_MODE_DOL 3
-#define DIO_MODE_DOPWM 4
-#define DIO_MODE_GPS 5		
 
 struct STime
 {
-	unsigned char ucYear;
-	unsigned char ucMonth;
-	unsigned char ucDay;
-	unsigned char ucHour;
-	unsigned char ucMinute;
-	unsigned char ucSecond;
-	unsigned short usMiliSecond;
+    unsigned char ucYear;
+    unsigned char ucMonth;
+    unsigned char ucDay;
+    unsigned char ucHour;
+    unsigned char ucMinute;
+    unsigned char ucSecond;
+    unsigned short usMiliSecond;
 };
+
 struct SAcc
 {
-	short a[3];
-	short T;
+    short a[3];
+    short T;
 };
+
 struct SGyro
 {
-	short w[3];
-	short T;
+    short w[3];
+    short T;
 };
+
 struct SAngle
 {
-	short Angle[3];
-	short T;
+    short Angle[3];
+    short T;
 };
+
 struct SMag
 {
-	short h[3];
-	short T;
+    short h[3];
+    short T;
 };
 
 struct SDStatus
 {
-	short sDStatus[4];
+    short sDStatus[4];
 };
 
 struct SPress
 {
-	long lPressure;
-	long lAltitude;
+    long lPressure;
+    long lAltitude;
 };
 
 struct SLonLat
 {
-	long lLon;
-	long lLat;
+    long lLon;
+    long lLat;
 };
 
 struct SGPSV
 {
-	short sGPSHeight;
-	short sGPSYaw;
-	long lGPSVelocity;
+    short sGPSHeight;
+    short sGPSYaw;
+    long lGPSVelocity;
 };
+
 struct SQ
-{ short q[4];
+{
+    short q[4];
 };
-
-
 
 void sendcmd(char *cmd);
 void CopeSerial2Data(unsigned char ucData);
 void UART2_Put_Char(unsigned char DataToSend);
+uint8_t JY901S_AngleReady(void);
+float JY901S_GetRollDeg(void);
+float JY901S_GetPitchDeg(void);
+float JY901S_GetYawDeg(void);
+
+extern struct STime stcTime;
+extern struct SAcc stcAcc;
+extern struct SGyro stcGyro;
+extern struct SAngle stcAngle;
+extern struct SMag stcMag;
+extern struct SDStatus stcDStatus;
+extern struct SPress stcPress;
+extern struct SLonLat stcLonLat;
+extern struct SGPSV stcGPSV;
+extern struct SQ stcQ;
 
 #endif
-
-
