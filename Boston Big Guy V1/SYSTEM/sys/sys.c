@@ -18,8 +18,15 @@ void INTX_ENABLE(void)
 }
 //…Ë÷√’ª∂•µÿ÷∑
 //addr:’ª∂•µÿ÷∑
-__asm void MSR_MSP(u32 addr) 
+#if defined(__CC_ARM) && !defined(__GNUC__)
+__asm void MSR_MSP(u32 addr)
 {
-    MSR MSP, r0 			//set Main Stack value
+    MSR MSP, r0
     BX r14
 }
+#else
+void MSR_MSP(u32 addr)
+{
+	__ASM volatile("msr msp, %0" : : "r" (addr) : );
+}
+#endif

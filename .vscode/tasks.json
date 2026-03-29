@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "stm32: setup local toolchain",
+            "type": "shell",
+            "command": "./scripts/setup-local-toolchain.sh",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "stm32: build",
+            "type": "shell",
+            "command": "./scripts/build.sh",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "stm32: setup local toolchain"
+        },
+        {
+            "label": "stm32: flash via DAPLink",
+            "type": "shell",
+            "command": "./scripts/flash.sh",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": "stm32: build"
+        },
+        {
+            "label": "stm32: openocd gdb server (DAPLink)",
+            "type": "shell",
+            "command": "./scripts/openocd-gdb-server.sh",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "problemMatcher": []
+        }
+    ]
+}

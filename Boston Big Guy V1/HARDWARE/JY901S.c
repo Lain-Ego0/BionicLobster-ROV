@@ -18,7 +18,7 @@ struct SQ       stcQ;
 
 void sendcmd(char *cmd)
 {
-	char i=0;
+	int i=0;
 	for(i=0;i<5;i++)
 	{
 		UART2_Put_Char(cmd[i]);

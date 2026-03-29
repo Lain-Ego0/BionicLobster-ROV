@@ -1,4 +1,4 @@
-#include "ms5837.h"
+#include "MS5837.h"
 /*
 C1 —π¡¶¡È√Ù∂» SENS|T1
 C2  —π¡¶≤π≥•  OFF|T1

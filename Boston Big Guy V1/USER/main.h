@@ -33,8 +33,8 @@
 
 //Hardware
 #include "AS5600.h"
-#include "ms5837.h"
-#include "jy901s.h"
+#include "MS5837.h"
+#include "JY901S.h"
 #include "A4988.h"
 #include "Motor.h"
 #include "Servo.h"

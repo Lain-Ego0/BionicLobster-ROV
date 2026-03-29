@@ -1,0 +1,24 @@
+/.tools/
+/build/
+/Boston Big Guy V1/OBJ/
+
+*.axf
+*.crf
+*.d
+*.dep
+*.htm
+*.html
+*.iex
+*.lnp
+*.lst
+*.map
+*.o
+*.sct
+*.uvguix.*
+*.uvoptx
+
+/Boston Big Guy V1/USER/DebugConfig/
+/Boston Big Guy V1/USER/EventRecorderStub.scvd
+/Boston Big Guy V1/USER/JLink*.txt
+/Boston Big Guy V1/USER/JLink*.ini
+/Boston Big Guy V1/USER/Nu_Link_Driver.ini
