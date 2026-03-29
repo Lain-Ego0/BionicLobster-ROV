@@ -1,4 +1,4 @@
-//╢к╡©╥жн╙GPIOЁУй╪╩╞
+//Ф╜╓И┐╗Е┬├Д╦╨GPIOЕ┬²Е╖▀Е▄√
 #include "GPIO.h"
 
 void MYGPIO_Init(void)
@@ -14,7 +14,7 @@ void MYGPIO_Init(void)
 									GPIO_Pin_8|GPIO_Pin_9|GPIO_Pin_10|GPIO_Pin_11;	//TIM1CH 1234
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA,&GPIO_InitStructure);
-	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM1,ENABLE);//в╒рБ╦╢сцё║ё║ё║ё║ё║
+	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM1,ENABLE);//ФЁ╗Ф└▐Е╓█Г■╗О╪│О╪│О╪│О╪│О╪│
 	GPIO_InitStructure.GPIO_Mode = 	GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Pin = 	GPIO_Pin_10|GPIO_Pin_11|						//TIM2CH 34
 									GPIO_Pin_6|GPIO_Pin_7|GPIO_Pin_8|GPIO_Pin_9|	//TIM4CH 1234
@@ -29,19 +29,19 @@ void MYGPIO_Init(void)
 //TIM1CH 1234
 /*PA8 PA9 PA10 PA11*/
 /*
-PA8		аЗо╨вСв╕
-PA9 	аЗо╨вСжБ
-PA10 	аЗо╨вСйж╠шио╡©360
-PA11	аЗо╨вСйж╠шоб╡©360
+PA8		И╬≥Х≥╬Е╥╕Г┬╙
+PA9 	И╬≥Х≥╬Е╥╕Х┌≤
+PA10 	И╬≥Х≥╬Е╥╕Ф┴▀Х┤┌Д╦┼И┐╗360
+PA11	И╬≥Х≥╬Е╥╕Ф┴▀Х┤┌Д╦▀И┐╗360
 */
 
 //TIM2CH 1234
 /*PA0 PA1 PB10 PB11*/
 /*
-PA0		аЗо╨срв╕
-PA1 	аЗо╨сржБ
-PB10 	аЗо╨срйж╠шио╡©360
-PB11	аЗо╨срйж╠шоб╡©360
+PA0		И╬≥Х≥╬Е▐ЁГ┬╙
+PA1 	И╬≥Х≥╬Е▐ЁХ┌≤
+PB10 	И╬≥Х≥╬Е▐ЁФ┴▀Х┤┌Д╦┼И┐╗360
+PB11	И╬≥Х≥╬Е▐ЁФ┴▀Х┤┌Д╦▀И┐╗360
 */
 
 //TIM3CH 12 4
@@ -49,17 +49,17 @@ PB11	аЗо╨срйж╠шоб╡©360
 //TIM4CH 2
 /*PB7*/
 /*
-PA6		н╡╡©ио╤Ф╩З
-PA7		н╡╡©об╤Ф╩З
-PB7		вСио╣Г╩З 
-PB1		срио╣Г╩З
+PA6		Е╟╬И┐╗Д╦┼Х┬╣Ф°╨
+PA7		Е╟╬И┐╗Д╦▀Х┬╣Ф°╨
+PB7		Е╥╕Д╦┼Г■╣Ф°╨ 
+PB1		Е▐ЁД╦┼Г■╣Ф°╨
 */
 
 //TIM4CH 1 34
 /*PB6   PB8 PB9*/
 /*
-PB6 	м╥╡©╣Г╩З
-		н╡╡©╣Г╩З1ё╗нч╣Г╩Зё╘
-PB8 	н╡╡©╣Г╩З3
-PB9		н╡╡©╣Г╩З2
+PB6 	Е╓╢И┐╗Г■╣Ф°╨
+		Е╟╬И┐╗Г■╣Ф°╨1О╪┬Ф≈═Г■╣Ф°╨О╪┴
+PB8 	Е╟╬И┐╗Г■╣Ф°╨3
+PB9		Е╟╬И┐╗Г■╣Ф°╨2
 */

@@ -245,7 +245,7 @@ USART2 接收使用中断方式，关键字节定义在 `firmware/SYSTEM/usart/u
   - `Right` 与 `Right_Spin` 都是 `0x08`
   - `Left_ARM_OPEN` 与 `water_push` 都是 `0x10`
 - 由于上述复用，`main.c` 里部分 `if` 判断会在同一个码值下连续触发多个动作，这一点在联调时要特别注意。
-- `BSP/PWM.c` 当前为空文件，PWM 真实初始化逻辑在 `BSP/timer.c`。
+- 旧的 `BSP/PWM.c/.h` 已移除；当前 PWM 初始化逻辑统一位于 `BSP/timer.c`。
 - `AS5600` 与 `JY901S` 驱动文件已加入工程，但当前主流程没有完整启用。
 
 ## License

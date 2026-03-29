@@ -15,7 +15,7 @@ void LED_Init(void)
 	GPIO_ResetBits(GPIOB,GPIO_Pin_14);
 	GPIO_ResetBits(GPIOB,GPIO_Pin_15);
 }
-//01¿ØÖÆLEDµÆÁÁ°µ
+//01æ§åˆ¶LEDç¯äº®æš—
 void LED_Control(unsigned char LED1,unsigned char LED2,unsigned char LED3,unsigned char LED4)
 {
 	if(LED1 == 0)GPIO_ResetBits(GPIOB,GPIO_Pin_12);
@@ -31,7 +31,7 @@ void LED_Control(unsigned char LED1,unsigned char LED2,unsigned char LED3,unsign
 	else GPIO_SetBits(GPIOB,GPIO_Pin_15);
 }
 
-//ÌØĞ§Á÷Ë®µÆ
+//ç‰¹æ•ˆæµæ°´ç¯
 void running_water_lamp(unsigned char time_scope)
 {
 	LED_Control(1,0,0,0);

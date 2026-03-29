@@ -1,3 +1,22 @@
 {
-    "ROS2.distro": "noetic"
+    "ROS2.distro": "noetic",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+    "C_Cpp.default.compilerPath": "${workspaceFolder}/.tools/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+    "C_Cpp.default.intelliSenseMode": "linux-gcc-arm",
+    "C_Cpp.default.cStandard": "gnu99",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/firmware/**",
+        "${workspaceFolder}/build/**"
+    ],
+    "C_Cpp.default.browse.path": [
+        "${workspaceFolder}/firmware",
+        "${workspaceFolder}/build"
+    ],
+    "C_Cpp.default.defines": [
+        "STM32F10X_MD",
+        "USE_STDPERIPH_DRIVER"
+    ],
+    "files.associations": {
+        "*.h": "c"
+    }
 }

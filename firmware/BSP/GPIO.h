@@ -2,6 +2,6 @@
 #define __GPIO_H	 
 #include "sys.h"
 
-void MYGPIO_Init(void);//³õÊ¼»¯
+void MYGPIO_Init(void);//åˆå§‹åŒ–
 		 				    
 #endif

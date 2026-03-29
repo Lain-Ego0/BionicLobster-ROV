@@ -18,18 +18,12 @@
 
 #include "Action.h"
 
-
-
 //SYSTEM
 #include "delay.h"
 #include "sys.h"
 
 //BSP 
-#include "timer.h"
-#include "usart.h"
 #include "IIC.h"
-
-
 
 //Hardware
 #include "AS5600.h"
@@ -38,11 +32,8 @@
 #include "A4988.h"
 #include "Motor.h"
 #include "Servo.h"
-#include "Action.h"
 
-
-
-//Ò£¿Ø°´¼ü¶¨Òå
+//é¥æ§æŒ‰é”®å®šä¹‰
 #define Front 0x01
 #define Back 0x02
 #define Left 0x04
@@ -108,4 +99,3 @@ int Get_work_state(void);
 
 
 #endif
-

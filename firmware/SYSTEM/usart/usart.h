@@ -8,7 +8,7 @@
 #define End_byte   0x7B
 
 extern uint8_t key;
-extern uint8_t hand_OC;//�򿪹ر�
+extern uint8_t hand_OC;//打开关闭
 extern uint8_t Left_Move;
 extern uint8_t Right_Move;
 extern uint8_t Water_Control;

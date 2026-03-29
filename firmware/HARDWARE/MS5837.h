@@ -14,7 +14,7 @@ extern double TEMP1ERATURE;
 extern double PRESSURE;
 extern double DEPTH;
 
-extern uint32_t  MS5837_date_buffer[MS5837_DATA_SIZE];//用于存放MS5837要发送的数据
+extern uint32_t  MS5837_date_buffer[MS5837_DATA_SIZE];//鐢ㄤ簬瀛樻斁MS5837瑕佸彂閫佺殑鏁版嵁
 
 
 //void MS5837_init(void);
