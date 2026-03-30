@@ -1,63 +1,63 @@
 # BionicLobster-ROV
 
-[English](./README.md) | [简体中文](./README.zh-CN.md)
+[简体中文](./README.md) | [English](./README.en.md)
 
 <p align="center">
-  <img src="Images/V2.png" alt="BionicLobster-ROV overview" width="82%">
+  <img src="Images/V2.png" alt="BionicLobster-ROV 项目总览" width="82%">
 </p>
 
-BionicLobster-ROV is a biomimetic underwater robot project built around dual `STM32F103C8` controllers. This repository contains the embedded firmware layer for actuation, sensing, board-to-board communication, and dorsal quad-thruster stabilization.
+BionicLobster-ROV 是一个基于双 `STM32F103C8` 主控的仿生龙虾水下机器人项目。本仓库保存的是底层嵌入式固件，负责执行器驱动、传感器采集、板间通信以及背部四旋翼稳定控制。
 
-Mechanical design and mechanical structure author: `zhenjiazhou`.
+机械部分作者：`zhenjiazhou`。
 
-The vision / perception side is maintained in a separate repository: <https://github.com/zhizhizzzzzzz/OceanSphere>.
+视觉 / 感知部分位于独立仓库：<https://github.com/zhizhizzzzzzz/OceanSphere>。
 
-## Highlights
+## 项目亮点
 
-- Dual-board control architecture:
-  - `firmware`: main board for manipulators, tail servos, 6x `AS5600`, `MS5837`, remote link, and command dispatch.
-  - `firmware_quad`: coprocessor for 1 head thruster, 4 tail thrusters, 4 dorsal quad motors, and `JY901S` IMU processing.
-- STM32 Standard Peripheral Library based project with plain C, timer PWM, USART interrupts, and software I2C.
-- Local Linux-friendly toolchain flow with repo-scoped scripts for build, flash, and OpenOCD.
+- 双板控制架构：
+  - `firmware`：主板，负责机械臂、尾部舵机、6 路 `AS5600`、`MS5837`、遥控串口以及向从板下发指令。
+  - `firmware_quad`：从板，负责头部推进、尾部 4 个推进电机、背部 4 个四旋翼电机以及 `JY901S` 姿态数据处理。
+- 使用 STM32 标准外设库，基于 C 语言实现，包含定时器 PWM、串口中断和软件 I2C。
+- 提供适合 Linux 的本地工具链、编译和烧录脚本，工具默认放在仓库内。
 
-## Architecture
+## 固件架构
 
-| Firmware | Role | Main peripherals |
+| 固件 | 作用 | 主要外设 |
 | --- | --- | --- |
-| `firmware` | Main control board | 2x 180-degree elbow servos, 2x claw servos, 4x arm continuous servos, 2x tail servos, 6x `AS5600`, `MS5837`, `USART1` board link, `USART2` remote / host link |
-| `firmware_quad` | Quad-thruster and propulsion board | 4x dorsal quad motors, 4x tail thrusters, 1x head thruster, `JY901S` IMU, `USART1` board link, `USART2` IMU link |
+| `firmware` | 主控制板 | 2 个肘部 180 度舵机、2 个夹爪舵机、4 个手臂连续旋转舵机、2 个尾部舵机、6 路 `AS5600`、`MS5837`、`USART1` 板间串口、`USART2` 上位机 / 遥控串口 |
+| `firmware_quad` | 推进与四旋翼从板 | 4 个背部四旋翼电机、4 个尾部推进电机、1 个头部推进电机、`JY901S` IMU、`USART1` 板间串口、`USART2` IMU 串口 |
 
-## Repository Layout
+## 仓库结构
 
-- `firmware/`: main-board firmware
-- `firmware_quad/`: propulsion / quad-thruster coprocessor firmware
-- `Images/`: project images and reference figures
-- `scripts/`: toolchain setup, build, flash, and debug helpers
-- `cmake/`: ARM GCC toolchain configuration
-- `openocd/`: OpenOCD target/interface configuration
-- `ld/`: linker scripts
+- `firmware/`：主板固件
+- `firmware_quad/`：推进 / 四旋翼从板固件
+- `Images/`：项目图片与参考图
+- `scripts/`：工具链安装、编译、烧录、调试脚本
+- `cmake/`：ARM GCC 工具链配置
+- `openocd/`：OpenOCD 配置
+- `ld/`：链接脚本
 
-## Build
+## 编译
 
-### 1. Set up the local toolchain
+### 1. 初始化本地工具链
 
 ```bash
 ./scripts/setup-local-toolchain.sh
 ```
 
-If you only need the compiler first:
+如果你暂时只想先安装编译器：
 
 ```bash
 ./scripts/setup-local-toolchain.sh --arm-only
 ```
 
-### 2. Build both firmware images
+### 2. 编译两份固件
 
 ```bash
 ./scripts/build.sh
 ```
 
-Build outputs:
+输出文件位于 `build/`：
 
 - `build/firmware.elf`
 - `build/firmware.hex`
@@ -66,56 +66,55 @@ Build outputs:
 - `build/firmware_quad.hex`
 - `build/firmware_quad.bin`
 
-### 3. Flash
+### 3. 烧录
 
-Flash the main board:
+烧录主板：
 
 ```bash
 ./scripts/flash.sh build/firmware.elf
 ```
 
-Flash the propulsion / quad board:
+烧录推进 / 四旋翼从板：
 
 ```bash
 ./scripts/flash.sh build/firmware_quad.elf
 ```
 
-### 4. Notes
+### 4. 说明
 
-- `CMakePresets.json` is included for newer CMake versions.
-- On older Linux distributions, the scripts are the most reliable entry point.
-- The default flashing workflow assumes `DAPLink (CMSIS-DAP)` plus OpenOCD.
+- 仓库中保留了 `CMakePresets.json`，适合较新的 CMake。
+- 如果系统 CMake 版本较老，优先使用 `scripts/` 中的脚本。
+- 当前默认烧录链路是 `DAPLink (CMSIS-DAP) + OpenOCD`。
 
-## Firmware Notes
+## 当前固件说明
 
-- The main board currently exposes named `AS5600` channels for:
+- 主板已经提供 6 路具名 `AS5600` 通道：
   - `left_arm_upper_360`
   - `left_arm_lower_360`
   - `right_arm_upper_360`
   - `right_arm_lower_360`
   - `tail_servo1`
   - `tail_servo2`
-- The quad board now uses a lightweight closed-loop flight controller based on `JY901S` angle and gyro data, including roll/pitch stabilization, yaw hold, command slew limiting, and IMU failover.
-- The repository is focused on low-level control. Higher-level autonomy and vision are intentionally kept separate.
+- 从板当前实现了一套轻量级闭环飞控，基于 `JY901S` 的角度与陀螺数据完成 `roll/pitch` 稳定、`yaw` 保持、指令斜坡与 IMU 失效降级。
+- 本仓库聚焦底层控制，高层自主策略和视觉能力不放在这里维护。
 
-## Media
+## 图片
 
 <p align="center">
-  <img src="Images/V3-1.png" alt="Project image 1" width="31%">
-  <img src="Images/V3-2.png" alt="Project image 2" width="31%">
-  <img src="Images/V3-3.png" alt="Project image 3" width="31%">
+  <img src="Images/V3-1.png" alt="项目图片 1" width="31%">
+  <img src="Images/V3-2.png" alt="项目图片 2" width="31%">
+  <img src="Images/V3-3.png" alt="项目图片 3" width="31%">
 </p>
 
 <p align="center">
-  <img src="Images/F103C8t6.png" alt="STM32F103C8 reference board" width="72%">
+  <img src="Images/F103C8t6.png" alt="STM32F103C8 开发板参考图" width="72%">
 </p>
 
-## Credits
+## 致谢
 
-- Mechanical design and mechanical structure: `zhenjiazhou`
-- Embedded firmware and control integration: repository contributors
-- Vision / perception repository: `OceanSphere`
+- 机械部分作者：`真甲咒`、`小白`
+- 视觉 / 感知：`大道寺知世`
 
 ## License
 
-This project is released under the [MIT License](./LICENSE).
+本项目使用 [MIT License](./LICENSE)。
