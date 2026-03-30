@@ -8,9 +8,13 @@
 
 BionicLobster-ROV is a biomimetic underwater robot project built around dual `STM32F103C8` controllers. This repository contains the embedded firmware layer for actuation, sensing, board-to-board communication, and dorsal quad-thruster stabilization.
 
-Mechanical design and mechanical structure author: `zhenjiazhou`.
+## Acknowledgements
 
-The vision / perception side is maintained in a separate repository: <https://github.com/zhizhizzzzzzz/OceanSphere>.
+- Mechanical platform: `真甲咒`, `小白`
+- Vision / perception: `大道寺知世`
+
+Mechanical platform open-source project: <https://github.com/iowqi/ShrimpROV>
+Vision / perception open-source project: <https://github.com/zhizhizzzzzzz/OceanSphere>.
 
 ## Highlights
 
@@ -109,11 +113,6 @@ Flash the propulsion / quad board:
 <p align="center">
   <img src="Images/F103C8t6.png" alt="STM32F103C8 reference board" width="72%">
 </p>
-
-## Credits
-
-- Mechanical design and mechanical structure: `zhenjiazhou`、`iowqi`
-- Vision / perception repository: `zhizhi`
 
 ## License
 
