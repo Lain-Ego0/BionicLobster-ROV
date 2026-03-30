@@ -12,9 +12,6 @@
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build",
       "toolchainFile": "${sourceDir}/cmake/arm-none-eabi-gcc.cmake",
-      "environment": {
-        "ARM_GNU_TOOLCHAIN_DIR": "${sourceDir}/.tools/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi"
-      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
