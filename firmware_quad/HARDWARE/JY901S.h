@@ -138,10 +138,15 @@ struct SQ
 void sendcmd(char *cmd);
 void CopeSerial2Data(unsigned char ucData);
 void UART2_Put_Char(unsigned char DataToSend);
+void JY901S_Tick(void);
 uint8_t JY901S_AngleReady(void);
+uint8_t JY901S_IsOnline(void);
 float JY901S_GetRollDeg(void);
 float JY901S_GetPitchDeg(void);
 float JY901S_GetYawDeg(void);
+float JY901S_GetRollRateDegPerSec(void);
+float JY901S_GetPitchRateDegPerSec(void);
+float JY901S_GetYawRateDegPerSec(void);
 
 extern struct STime stcTime;
 extern struct SAcc stcAcc;

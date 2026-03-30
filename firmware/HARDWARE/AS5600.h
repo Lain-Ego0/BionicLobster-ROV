@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define AS5600_SENSOR_COUNT 5
+#define AS5600_SENSOR_COUNT 6
 
 typedef enum
 {
@@ -11,7 +11,8 @@ typedef enum
     AS5600_LEFT_ARM_LOWER = 1,
     AS5600_RIGHT_ARM_UPPER = 2,
     AS5600_RIGHT_ARM_LOWER = 3,
-    AS5600_TAIL_CABLE_JOINT = 4
+    AS5600_TAIL_SERVO1 = 4,
+    AS5600_TAIL_SERVO2 = 5
 } AS5600_SensorId;
 
 typedef struct

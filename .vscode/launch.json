@@ -2,11 +2,29 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "STM32F103C8 (DAPLink/OpenOCD)",
+            "name": "STM32F103C8 Main (DAPLink/OpenOCD)",
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/build/TIMER.elf",
+            "executable": "${workspaceFolder}/build/firmware.elf",
+            "servertype": "openocd",
+            "serverpath": "${workspaceFolder}/scripts/openocd-wrapper.sh",
+            "configFiles": [
+                "${workspaceFolder}/openocd/daplink-stm32f103c8.cfg"
+            ],
+            "searchDir": [
+                "${workspaceFolder}/.tools/xpack-openocd-0.12.0-7/openocd/scripts"
+            ],
+            "gdbPath": "${workspaceFolder}/scripts/gdb-wrapper.sh",
+            "device": "STM32F103C8",
+            "runToEntryPoint": "main"
+        },
+        {
+            "name": "STM32F103C8 Quad (DAPLink/OpenOCD)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/firmware_quad.elf",
             "servertype": "openocd",
             "serverpath": "${workspaceFolder}/scripts/openocd-wrapper.sh",
             "configFiles": [

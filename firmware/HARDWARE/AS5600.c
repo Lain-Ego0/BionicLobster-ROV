@@ -17,7 +17,8 @@ static const AS5600_DeviceConfig g_as5600_devices[AS5600_SENSOR_COUNT] =
     {{GPIOB, GPIO_Pin_4, GPIOB, GPIO_Pin_12}, "left_arm_lower_360"},
     {{GPIOB, GPIO_Pin_4, GPIOB, GPIO_Pin_13}, "right_arm_upper_360"},
     {{GPIOB, GPIO_Pin_4, GPIOB, GPIO_Pin_14}, "right_arm_lower_360"},
-    {{GPIOB, GPIO_Pin_4, GPIOB, GPIO_Pin_15}, "tail_cable_joint"},
+    {{GPIOB, GPIO_Pin_4, GPIOB, GPIO_Pin_15}, "tail_servo1"},
+    {{GPIOB, GPIO_Pin_4, GPIOB, GPIO_Pin_5}, "tail_servo2"},
 };
 
 static AS5600_State g_as5600_states[AS5600_SENSOR_COUNT];

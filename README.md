@@ -15,7 +15,7 @@ The vision / perception side is maintained in a separate repository: <https://gi
 ## Highlights
 
 - Dual-board control architecture:
-  - `firmware`: main board for manipulators, tail servos, 5x `AS5600`, `MS5837`, buoyancy stepper, remote link, and command dispatch.
+  - `firmware`: main board for manipulators, tail servos, 6x `AS5600`, `MS5837`, remote link, and command dispatch.
   - `firmware_quad`: coprocessor for 1 head thruster, 4 tail thrusters, 4 dorsal quad motors, and `JY901S` IMU processing.
 - STM32 Standard Peripheral Library based project with plain C, timer PWM, USART interrupts, and software I2C.
 - Local Linux-friendly toolchain flow with repo-scoped scripts for build, flash, and OpenOCD.
@@ -24,7 +24,7 @@ The vision / perception side is maintained in a separate repository: <https://gi
 
 | Firmware | Role | Main peripherals |
 | --- | --- | --- |
-| `firmware` | Main control board | 2x 180-degree elbow servos, 2x claw servos, 4x arm continuous servos, 2x tail servos, 5x `AS5600`, `MS5837`, `A4988`, `USART1` board link, `USART2` remote / host link |
+| `firmware` | Main control board | 2x 180-degree elbow servos, 2x claw servos, 4x arm continuous servos, 2x tail servos, 6x `AS5600`, `MS5837`, `USART1` board link, `USART2` remote / host link |
 | `firmware_quad` | Quad-thruster and propulsion board | 4x dorsal quad motors, 4x tail thrusters, 1x head thruster, `JY901S` IMU, `USART1` board link, `USART2` IMU link |
 
 ## Repository Layout
@@ -93,8 +93,9 @@ Flash the propulsion / quad board:
   - `left_arm_lower_360`
   - `right_arm_upper_360`
   - `right_arm_lower_360`
-  - `tail_cable_joint`
-- The quad board currently uses a lightweight IMU-based level-hold mix for dorsal thrust stabilization.
+  - `tail_servo1`
+  - `tail_servo2`
+- The quad board now uses a lightweight closed-loop flight controller based on `JY901S` angle and gyro data, including roll/pitch stabilization, yaw hold, command slew limiting, and IMU failover.
 - The repository is focused on low-level control. Higher-level autonomy and vision are intentionally kept separate.
 
 ## Media

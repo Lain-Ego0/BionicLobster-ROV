@@ -1,21 +1,35 @@
 {
-    "ROS2.distro": "noetic",
     "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
-    "C_Cpp.default.compilerPath": "${workspaceFolder}/.tools/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+    "C_Cpp.default.compilerPath": "${workspaceFolder}/scripts/gcc-wrapper.sh",
     "C_Cpp.default.intelliSenseMode": "linux-gcc-arm",
     "C_Cpp.default.cStandard": "gnu99",
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/firmware/**",
+        "${workspaceFolder}/firmware_quad/**",
         "${workspaceFolder}/build/**"
     ],
     "C_Cpp.default.browse.path": [
         "${workspaceFolder}/firmware",
+        "${workspaceFolder}/firmware_quad",
         "${workspaceFolder}/build"
     ],
     "C_Cpp.default.defines": [
         "STM32F10X_MD",
         "USE_STDPERIPH_DRIVER"
     ],
+    "cmake.useCMakePresets": "always",
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.configureEnvironment": {
+        "ARM_GNU_TOOLCHAIN_DIR": "${workspaceFolder}/.tools/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi"
+    },
+    "cmake.buildEnvironment": {
+        "ARM_GNU_TOOLCHAIN_DIR": "${workspaceFolder}/.tools/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi"
+    },
+    "cmake.configureSettings": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/cmake/arm-none-eabi-gcc.cmake"
+    },
     "files.associations": {
         "*.h": "c"
     }

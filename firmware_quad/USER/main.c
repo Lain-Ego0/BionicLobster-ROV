@@ -53,11 +53,13 @@ int main(void)
     uart_init1(115200);
     uart_init2(115200);
     ESC_Init();
+    FlightControl_Init();
     Control_ResetState();
 
     while (1)
     {
         BoardLink_Tick();
+        JY901S_Tick();
 
         if (BoardLink_IsOnline() == 0)
         {

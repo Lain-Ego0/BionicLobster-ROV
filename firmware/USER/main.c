@@ -76,7 +76,6 @@ int main(void)
     PWM_ParameterConfiguration();
     uart_init1(115200);
     uart_init2(115200);
-    MOTOR_Init();
     MS5837_init();
     AS5600_InitAll();
     Control_ResetState();
@@ -85,15 +84,6 @@ int main(void)
     {
         AS5600_UpdateAll();
         workstate = Get_work_state();
-
-        if (Left_Move == water_push)
-        {
-            motor_control(1, 150, 8000);
-        }
-        else if (Right_Move == water_absorption)
-        {
-            motor_control(0, 150, 8000);
-        }
 
         if (workstate == 0)
         {

@@ -22,7 +22,10 @@ function(add_stm32_target target_name firmware_root)
         "${firmware_root}/STM32F10x_FWLib/src/stm32f10x_usart.c"
     )
 
-    set_target_properties(${target_name}.elf PROPERTIES OUTPUT_NAME ${target_name})
+    set_target_properties(${target_name}.elf PROPERTIES
+        OUTPUT_NAME ${target_name}
+        SUFFIX ".elf"
+    )
 
     target_include_directories(${target_name}.elf PRIVATE
         "${firmware_root}/SYSTEM/delay"
@@ -84,7 +87,6 @@ add_stm32_target(firmware "${FIRMWARE_ROOT}"
     "${FIRMWARE_ROOT}/USER/Action.c"
     "${FIRMWARE_ROOT}/HARDWARE/AS5600.c"
     "${FIRMWARE_ROOT}/HARDWARE/MS5837.c"
-    "${FIRMWARE_ROOT}/HARDWARE/A4988.c"
     "${FIRMWARE_ROOT}/HARDWARE/Servo.c"
     "${FIRMWARE_ROOT}/BSP/GPIO.c"
     "${FIRMWARE_ROOT}/BSP/stmflash.c"
@@ -104,6 +106,7 @@ add_stm32_target(firmware_quad "${FIRMWARE_QUAD_ROOT}"
     "${FIRMWARE_QUAD_ROOT}/USER/stm32f10x_it.c"
     "${FIRMWARE_QUAD_ROOT}/USER/system_stm32f10x.c"
     "${FIRMWARE_QUAD_ROOT}/USER/Action.c"
+    "${FIRMWARE_QUAD_ROOT}/USER/FlightControl.c"
     "${FIRMWARE_QUAD_ROOT}/HARDWARE/JY901S.c"
     "${FIRMWARE_QUAD_ROOT}/HARDWARE/Motor.c"
     "${FIRMWARE_QUAD_ROOT}/HARDWARE/Servo.c"

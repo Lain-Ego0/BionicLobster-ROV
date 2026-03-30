@@ -29,7 +29,6 @@
 #include "AS5600.h"
 #include "MS5837.h"
 #include "JY901S.h"
-#include "A4988.h"
 #include "Servo.h"
 
 // 遥控按键定义
@@ -50,9 +49,6 @@
 
 #define Right_ARM_OPEN 0x10
 #define Right_ARM_CLOSE 0x20
-
-#define water_push 0x10
-#define water_absorption 0x20
 
 int Get_work_state(void);
 
