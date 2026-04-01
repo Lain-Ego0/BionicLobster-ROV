@@ -16,31 +16,66 @@ volatile uint8_t Left_Move = 0x00;
 volatile uint8_t Right_Move = 0x00;
 volatile uint8_t Water_Control = 0x00;
 
+static void MainBoard_BuildBoardCommand(BoardControlCommand *command)
+{
+    int surge_input = 0;
+    int yaw_input = 0;
+    int heave_input = 0;
+
+    command->mode = BOARD_CONTROL_MODE_SAFE;
+    command->surge = 0;
+    command->yaw = 0;
+    command->heave = 0;
+    command->flags = BOARD_CONTROL_FLAG_NONE;
+
+    if ((key & Front) != 0u)
+    {
+        surge_input += BOARD_CONTROL_AXIS_MAX;
+    }
+    if ((key & Back) != 0u)
+    {
+        surge_input -= BOARD_CONTROL_AXIS_MAX;
+    }
+    if ((key & Right) != 0u)
+    {
+        yaw_input += BOARD_CONTROL_AXIS_MAX;
+    }
+    if ((key & Left) != 0u)
+    {
+        yaw_input -= BOARD_CONTROL_AXIS_MAX;
+    }
+    if ((key & Up) != 0u)
+    {
+        heave_input += BOARD_CONTROL_AXIS_MAX;
+    }
+    if ((key & Down) != 0u)
+    {
+        heave_input -= BOARD_CONTROL_AXIS_MAX;
+    }
+
+    command->surge = BoardControl_ClampAxis(surge_input);
+    command->yaw = BoardControl_ClampAxis(yaw_input);
+    command->heave = BoardControl_ClampAxis(heave_input);
+
+    if (command->surge != 0 || command->yaw != 0 || command->heave != 0)
+    {
+        command->mode = BOARD_CONTROL_MODE_STABILIZE;
+    }
+}
+
 static void MainBoard_HandleMotion(void)
 {
-    switch (key)
+    if ((key & Front) != 0u && (key & Back) == 0u)
     {
-        case Front:
-            MoveForward();
-            break;
-        case Back:
-            MoveBackward();
-            break;
-        case Left:
-            MoveLeft();
-            break;
-        case Right:
-            MoveRight();
-            break;
-        case Up:
-            Ascend();
-            break;
-        case Down:
-            Descend();
-            break;
-        default:
-            Start();
-            break;
+        MoveForward();
+    }
+    else if ((key & Back) != 0u && (key & Front) == 0u)
+    {
+        MoveBackward();
+    }
+    else
+    {
+        Start();
     }
 }
 
@@ -70,6 +105,8 @@ int workstate=0;
 
 int main(void) 
 {
+    BoardControlCommand board_command;
+
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // 设置 NVIC 中断分组 2:2 位抢占优先级，2 位响应优先级
 
     MYGPIO_Init();
@@ -95,7 +132,9 @@ int main(void)
             MainBoard_HandleManipulator();
         }
 
-        BoardLink_SendFrame();
+        MainBoard_BuildBoardCommand(&board_command);
+        BoardLink_SendCommand(&board_command);
+        QuadTelemetry_FlushToHost();
         delay_ms(10);
     }
 }

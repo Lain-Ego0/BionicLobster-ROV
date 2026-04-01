@@ -23,6 +23,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h" 
+#include "Scheduler.h"
 
 
  
@@ -77,6 +78,15 @@ void PendSV_Handler(void)
  
 void SysTick_Handler(void)
 {
+}
+
+void TIM4_IRQHandler(void)
+{
+  if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
+  {
+    Scheduler_HandleTickISR();
+    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+  }
 }
 
 /******************************************************************************/

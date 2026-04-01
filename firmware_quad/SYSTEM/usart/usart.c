@@ -3,13 +3,15 @@
 
 typedef struct
 {
-    uint8_t buffer[CONTROL_FRAME_SIZE];
+    uint8_t buffer[BOARD_LINK_FRAME_SIZE];
     uint8_t index;
     uint8_t receiving;
 } ControlFrameParser;
 
 static ControlFrameParser g_board_parser;
 static volatile uint32_t g_board_link_age = BOARD_LINK_TIMEOUT_TICKS + 1U;
+static volatile BoardControlCommand g_board_command;
+static uint8_t g_telemetry_sequence = 0u;
 
 static void USART_CommonInit(USART_TypeDef *usart, uint32_t baud_rate)
 {
@@ -38,13 +40,23 @@ static void ControlParser_Reset(ControlFrameParser *parser)
     parser->receiving = 0;
 }
 
+static void USART_SendArrayBlocking(USART_TypeDef *usart, const uint8_t *array, uint16_t length)
+{
+    uint16_t i;
+
+    for (i = 0; i < length; i++)
+    {
+        USART_SendByteBlocking(usart, array[i]);
+    }
+}
+
 static void ApplyBoardFrame(const uint8_t *frame)
 {
-    key = frame[1];
-    Left_Move = frame[2];
-    Right_Move = frame[3];
-    hand_OC = frame[4];
-    Water_Control = frame[5];
+    g_board_command.mode = frame[BOARD_LINK_MODE_INDEX];
+    g_board_command.surge = (int8_t)frame[BOARD_LINK_SURGE_INDEX];
+    g_board_command.yaw = (int8_t)frame[BOARD_LINK_YAW_INDEX];
+    g_board_command.heave = (int8_t)frame[BOARD_LINK_HEAVE_INDEX];
+    g_board_command.flags = frame[BOARD_LINK_FLAGS_INDEX];
     g_board_link_age = 0;
 }
 
@@ -52,7 +64,7 @@ static void ControlParser_Push(ControlFrameParser *parser, uint8_t byte)
 {
     if (parser->receiving == 0)
     {
-        if (byte == Start_byte)
+        if (byte == BOARD_LINK_START_BYTE)
         {
             parser->receiving = 1;
             parser->index = 0;
@@ -61,7 +73,7 @@ static void ControlParser_Push(ControlFrameParser *parser, uint8_t byte)
         return;
     }
 
-    if (parser->index >= CONTROL_FRAME_SIZE)
+    if (parser->index >= BOARD_LINK_FRAME_SIZE)
     {
         ControlParser_Reset(parser);
         return;
@@ -69,9 +81,12 @@ static void ControlParser_Push(ControlFrameParser *parser, uint8_t byte)
 
     parser->buffer[parser->index++] = byte;
 
-    if (parser->index == CONTROL_FRAME_SIZE)
+    if (parser->index == BOARD_LINK_FRAME_SIZE)
     {
-        if (parser->buffer[0] == Start_byte && parser->buffer[CONTROL_FRAME_SIZE - 1] == End_byte)
+        if (parser->buffer[BOARD_LINK_START_INDEX] == BOARD_LINK_START_BYTE &&
+            parser->buffer[BOARD_LINK_END_INDEX] == BOARD_LINK_END_BYTE &&
+            parser->buffer[BOARD_LINK_VERSION_INDEX] == BOARD_LINK_VERSION &&
+            parser->buffer[BOARD_LINK_CHECKSUM_INDEX] == BoardLink_CalculateChecksum(parser->buffer))
         {
             ApplyBoardFrame(parser->buffer);
         }
@@ -145,11 +160,11 @@ void Serial_SendByte(uint8_t byte)
 
 void Control_ResetState(void)
 {
-    key = 0x00;
-    hand_OC = 0x00;
-    Left_Move = 0x00;
-    Right_Move = 0x00;
-    Water_Control = 0x00;
+    g_board_command.mode = BOARD_CONTROL_MODE_SAFE;
+    g_board_command.surge = 0;
+    g_board_command.yaw = 0;
+    g_board_command.heave = 0;
+    g_board_command.flags = BOARD_CONTROL_FLAG_NONE;
 }
 
 void BoardLink_Tick(void)
@@ -163,6 +178,55 @@ void BoardLink_Tick(void)
 uint8_t BoardLink_IsOnline(void)
 {
     return (g_board_link_age < BOARD_LINK_TIMEOUT_TICKS) ? 1U : 0U;
+}
+
+void BoardLink_GetControlCommand(BoardControlCommand *command)
+{
+    if (command == NULL)
+    {
+        return;
+    }
+
+    command->mode = g_board_command.mode;
+    command->surge = g_board_command.surge;
+    command->yaw = g_board_command.yaw;
+    command->heave = g_board_command.heave;
+    command->flags = g_board_command.flags;
+}
+
+void TelemetryLink_SendStatus(const QuadTelemetryStatus *status)
+{
+    QuadTelemetryStatus safe_status;
+    uint8_t frame[TELEMETRY_LINK_FRAME_SIZE];
+
+    if (status == NULL)
+    {
+        safe_status.run_state = 0u;
+        safe_status.fault_flags = 0u;
+        safe_status.board_link_online = 0u;
+        safe_status.imu_online = 0u;
+        safe_status.control_mode = BOARD_CONTROL_MODE_SAFE;
+        safe_status.surge = 0;
+        safe_status.yaw = 0;
+        safe_status.heave = 0;
+        status = &safe_status;
+    }
+
+    frame[TELEMETRY_LINK_START_INDEX] = TELEMETRY_LINK_START_BYTE;
+    frame[TELEMETRY_LINK_VERSION_INDEX] = TELEMETRY_LINK_VERSION;
+    frame[TELEMETRY_LINK_SEQUENCE_INDEX] = g_telemetry_sequence++;
+    frame[TELEMETRY_LINK_RUN_STATE_INDEX] = status->run_state;
+    frame[TELEMETRY_LINK_FAULT_FLAGS_INDEX] = status->fault_flags;
+    frame[TELEMETRY_LINK_BOARD_LINK_INDEX] = status->board_link_online;
+    frame[TELEMETRY_LINK_IMU_INDEX] = status->imu_online;
+    frame[TELEMETRY_LINK_MODE_INDEX] = status->control_mode;
+    frame[TELEMETRY_LINK_SURGE_INDEX] = (uint8_t)status->surge;
+    frame[TELEMETRY_LINK_YAW_INDEX] = (uint8_t)status->yaw;
+    frame[TELEMETRY_LINK_HEAVE_INDEX] = (uint8_t)status->heave;
+    frame[TELEMETRY_LINK_CHECKSUM_INDEX] = TelemetryLink_CalculateChecksum(frame);
+    frame[TELEMETRY_LINK_END_INDEX] = TELEMETRY_LINK_END_BYTE;
+
+    USART_SendArrayBlocking(USART1, frame, TELEMETRY_LINK_FRAME_SIZE);
 }
 
 void USART1_IRQHandler(void)

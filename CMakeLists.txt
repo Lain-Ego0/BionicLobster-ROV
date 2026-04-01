@@ -28,6 +28,7 @@ function(add_stm32_target target_name firmware_root)
     )
 
     target_include_directories(${target_name}.elf PRIVATE
+        "${PROJECT_ROOT}/common"
         "${firmware_root}/SYSTEM/delay"
         "${firmware_root}/SYSTEM/sys"
         "${firmware_root}/SYSTEM/usart"
@@ -106,6 +107,8 @@ add_stm32_target(firmware_quad "${FIRMWARE_QUAD_ROOT}"
     "${FIRMWARE_QUAD_ROOT}/USER/stm32f10x_it.c"
     "${FIRMWARE_QUAD_ROOT}/USER/system_stm32f10x.c"
     "${FIRMWARE_QUAD_ROOT}/USER/Action.c"
+    "${FIRMWARE_QUAD_ROOT}/USER/RunState.c"
+    "${FIRMWARE_QUAD_ROOT}/USER/Scheduler.c"
     "${FIRMWARE_QUAD_ROOT}/USER/FlightControl.c"
     "${FIRMWARE_QUAD_ROOT}/HARDWARE/JY901S.c"
     "${FIRMWARE_QUAD_ROOT}/HARDWARE/Motor.c"
