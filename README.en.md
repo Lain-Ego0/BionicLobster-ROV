@@ -1,7 +1,7 @@
 # BionicLobster-ROV
 
 <p align="center">
-  <a href="./README.md">Simplified Chinese</a> · <a href="./README.en.md">English</a>
+  <a href="./README.md">Simplified Chinese</a> · <a href="./README.en.md">English</a> · <a href="https://github.com/iowqi/ShrimpROV">Open-source Mechanical Project</a> · <a href="https://github.com/zhizhizzzzzzz/OceanSphere">Open-source Vision / Perception Project</a>
 </p>
 
 <p align="center">
